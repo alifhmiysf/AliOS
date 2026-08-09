@@ -1,0 +1,1 @@
+D:\Coding\Exercise\AliOS\target\debug\alios.exe: D:\Coding\Exercise\AliOS\build.rs D:\Coding\Exercise\AliOS\kernel\src\font.rs D:\Coding\Exercise\AliOS\kernel\src\framebuffer.rs D:\Coding\Exercise\AliOS\kernel\src\main.rs D:\Coding\Exercise\AliOS\kernel\src\terminal.rs D:\Coding\Exercise\AliOS\src\main.rs

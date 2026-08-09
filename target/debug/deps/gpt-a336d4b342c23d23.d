@@ -1,0 +1,13 @@
+D:\Coding\Exercise\AliOS\target\debug\deps\gpt-a336d4b342c23d23.d: C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\lib.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\macros.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\disk.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\header.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\mbr.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\partition.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\partition_types.rs
+
+D:\Coding\Exercise\AliOS\target\debug\deps\libgpt-a336d4b342c23d23.rlib: C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\lib.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\macros.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\disk.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\header.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\mbr.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\partition.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\partition_types.rs
+
+D:\Coding\Exercise\AliOS\target\debug\deps\libgpt-a336d4b342c23d23.rmeta: C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\lib.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\macros.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\disk.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\header.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\mbr.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\partition.rs C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\partition_types.rs
+
+C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\lib.rs:
+C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\macros.rs:
+C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\disk.rs:
+C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\header.rs:
+C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\mbr.rs:
+C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\partition.rs:
+C:\Users\Ali\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gpt-3.1.0\src\partition_types.rs:
