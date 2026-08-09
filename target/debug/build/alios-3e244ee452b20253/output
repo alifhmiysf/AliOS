@@ -1,0 +1,1 @@
+cargo:rustc-env=BIOS_PATH=D:\Coding\Exercise\AliOS\target\debug\build\alios-3e244ee452b20253\out\alios-bios.img

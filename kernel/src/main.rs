@@ -1,4 +1,6 @@
 
+#![allow(static_mut_refs)]
+#![feature(abi_x86_interrupt)]
 #![no_std]
 #![no_main]
 
@@ -9,6 +11,7 @@
 mod framebuffer;
 mod font;
 mod terminal;
+mod interrupts;
 
 use bootloader_api::{
     entry_point,
@@ -429,7 +432,7 @@ fn kernel_main(
                 info.stride,
                 info.bytes_per_pixel,
             );
-
+            interrupts::init_idt();
         // ====================================================
         // BACKGROUND
         // ====================================================
