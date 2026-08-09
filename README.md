@@ -2,7 +2,7 @@
 
 A minimal experimental operating system kernel written in **Rust**.
 
-AliOS is a learning project created to explore low-level programming, operating system concepts, framebuffer graphics, keyboard input, and terminal implementation using Rust.
+AliOS is a learning project created to explore low-level programming, operating system concepts, framebuffer graphics, keyboard input, hardware interrupts, and terminal implementation using Rust.
 
 > **Status:** 🚧 AliOS v0.1 — Experimental / In Development
 
@@ -16,15 +16,20 @@ Current features:
 * Custom framebuffer rendering
 * Custom bitmap font
 * Basic terminal interface
-* Keyboard input through PS/2 port
+* PS/2 keyboard input
+* Keyboard hardware interrupt (`IRQ1`)
+* Interrupt Descriptor Table (IDT)
+* PIC 8259 initialization
+* Keyboard interrupt handler
+* Scancode processing
 * Command buffer
 * Command execution
 * Cursor rendering
-* Cursor blinking
+* Blinking cursor
 * Terminal line management
 * Automatic terminal scrolling
-* Terminal clear
-* Basic commands
+* Terminal clearing
+* Basic shell commands
 
 ### Available Commands
 
@@ -52,9 +57,11 @@ ABOUT - ABOUT ALIOS
 * **Rust**
 * `no_std`
 * `bootloader`
-* x86_64
+* `x86_64`
 * Framebuffer
 * PS/2 Keyboard
+* 8259 PIC
+* Interrupt Descriptor Table (IDT)
 * QEMU
 * Cargo
 
@@ -70,7 +77,8 @@ AliOS/
 │   │   ├── main.rs
 │   │   ├── framebuffer.rs
 │   │   ├── terminal.rs
-│   │   └── font.rs
+│   │   ├── font.rs
+│   │   └── interrupts.rs
 │   │
 │   └── Cargo.toml
 │
@@ -81,20 +89,23 @@ AliOS/
 
 ### `main.rs`
 
-Kernel entry point and main operating system loop.
+The main kernel entry point and operating system loop.
 
 Responsible for:
 
 * Kernel initialization
-* Keyboard input
-* Scancode processing
+* Framebuffer initialization
+* Terminal initialization
+* Interrupt initialization
+* Keyboard input processing
+* Scancode-to-character conversion
 * Command processing
-* Terminal interaction
 * Cursor handling
+* Shell interaction
 
 ### `framebuffer.rs`
 
-Low-level graphics abstraction.
+Provides the low-level graphics abstraction used by AliOS.
 
 Responsible for:
 
@@ -102,34 +113,122 @@ Responsible for:
 * Drawing rectangles
 * Drawing characters
 * Drawing text
-* Scrolling framebuffer regions
 * Clearing screen areas
+* Scrolling framebuffer regions
 
 ### `font.rs`
 
-Contains the bitmap font used by AliOS for rendering text.
+Contains the bitmap font used by AliOS to render text on the framebuffer.
 
 ### `terminal.rs`
 
-Manages the terminal state.
+Manages terminal state and screen positioning.
 
 Responsible for:
 
-* Current cursor line
+* Current terminal position
 * Line movement
+* Terminal boundaries
 * Terminal scrolling
 * Terminal clearing
-* Terminal boundaries
+* Background management
+
+### `interrupts.rs`
+
+Handles CPU and hardware interrupts.
+
+Currently responsible for:
+
+* Creating and loading the Interrupt Descriptor Table (IDT)
+* Registering CPU exception handlers
+* Initializing the 8259 PIC
+* Handling keyboard `IRQ1`
+* Reading keyboard scancodes from port `0x60`
+* Passing keyboard scancodes to the kernel
+* Sending End Of Interrupt (EOI) signals to the PIC
+
+---
+
+## ⚡ Interrupt Architecture
+
+AliOS now receives keyboard input through a hardware interrupt instead of continuously polling the keyboard port from the main kernel loop.
+
+The current keyboard flow is:
+
+```text
+Physical Keyboard
+       │
+       ▼
+    PS/2 Controller
+       │
+       ▼
+      IRQ1
+       │
+       ▼
+   PIC 8259
+       │
+       ▼
+   Interrupt 33
+       │
+       ▼
+      IDT
+       │
+       ▼
+keyboard_handler()
+       │
+       ▼
+   Port 0x60
+       │
+       ▼
+Keyboard Scancode
+       │
+       ▼
+Atomic Scancode Buffer
+       │
+       ▼
+    main.rs
+       │
+       ▼
+Scancode → Character
+       │
+       ▼
+Terminal / Shell
+```
+
+### Keyboard Interrupt
+
+The keyboard is connected to **IRQ1**.
+
+AliOS remaps the master PIC so that:
+
+```text
+IRQ0 → Interrupt 32
+IRQ1 → Interrupt 33
+IRQ2 → Interrupt 34
+...
+```
+
+Therefore the keyboard interrupt is handled through:
+
+```text
+IDT[33]
+```
+
+The keyboard handler reads the scancode directly from:
+
+```text
+Port 0x60
+```
+
+After processing the interrupt, AliOS sends an **EOI (End Of Interrupt)** signal to the PIC so that subsequent hardware interrupts can continue.
 
 ---
 
 ## ⌨️ Keyboard
 
-AliOS currently reads keyboard input directly through the traditional PS/2 controller ports.
+AliOS currently supports keyboard input through the traditional PS/2 controller.
 
-Keyboard scancodes are converted into characters inside the kernel.
-
-Currently supported:
+Supported input includes:
 
 * `A-Z`
 * `0-9`
@@ -138,6 +237,40 @@ Currently supported:
 * `=`
 * Enter
 * Backspace
+
+Keyboard scancodes are received by the interrupt handler and then converted into characters by the kernel.
+
+Currently, the keyboard scancode buffer uses a single-byte atomic buffer. This is intentionally simple for the early version of AliOS and can later be replaced with a proper keyboard ring buffer.
+
+---
+
+## 🖥️ Terminal
+
+AliOS provides a simple framebuffer-based terminal.
+
+The terminal currently supports:
+
+* Command input
+* Cursor positioning
+* Cursor blinking
+* Backspace
+* Enter
+* New lines
+* Automatic scrolling
+* Screen clearing
+* Command output
+
+The shell uses a simple command buffer with a maximum length of **64 characters**.
+
+Example:
+
+```text
+> ABOUT
+
+ALIOS V0.1
+A SIMPLE OPERATING SYSTEM
+WRITTEN IN RUST.
+```
 
 ---
 
@@ -148,15 +281,16 @@ AliOS currently uses a minimal dark interface with:
 * Dark background
 * Light text
 * Blue accent color
-* Boot title
+* Centered boot title
+* Accent line
 * Terminal prompt
 * Blinking cursor
 
 Example:
 
 ```text
-WELCOME TO ALIOS!
-────────────────────────────
+             WELCOME TO ALIOS!
+             ──────────────────────────
 
 > HELP
 
@@ -177,7 +311,8 @@ Make sure the following are installed:
 * Rust
 * Cargo
 * QEMU
-* Required Rust target/toolchain for the bootloader configuration
+* Required Rust nightly toolchain
+* Required bootloader dependencies
 
 Check Rust:
 
@@ -202,11 +337,15 @@ From the project root:
 cargo build
 ```
 
-A successful build should look similar to:
+For checking the kernel without producing the final boot image:
+
+```bash
+cargo check
+```
+
+A successful build should finish with output similar to:
 
 ```text
-Compiling alios-kernel v0.1.0
-Compiling alios v0.1.0
 Finished `dev` profile
 ```
 
@@ -214,11 +353,27 @@ Finished `dev` profile
 
 ## 🧪 Development
 
-AliOS is currently an experimental operating system project.
+AliOS is an experimental operating system project built primarily for learning.
 
-The goal is not to build a production-ready OS, but to understand how operating systems work from the lowest level.
+The goal is not to create a production-ready operating system, but to understand how an operating system interacts with hardware and manages its own execution environment.
 
-Development will gradually move from a simple framebuffer terminal toward a more complete kernel architecture.
+Development currently focuses on building the kernel from the lowest level upward:
+
+```text
+Boot
+ ↓
+Framebuffer
+ ↓
+Terminal
+ ↓
+Keyboard
+ ↓
+Interrupts
+ ↓
+Shell
+ ↓
+Kernel subsystems
+```
 
 ---
 
@@ -230,8 +385,9 @@ Development will gradually move from a simple framebuffer terminal toward a more
 * [x] Framebuffer
 * [x] Bitmap font
 * [x] Text rendering
-* [x] Keyboard input
 * [x] Terminal
+* [x] Keyboard input
+* [x] PS/2 keyboard support
 * [x] Command buffer
 * [x] `HELP`
 * [x] `CLEAR`
@@ -239,6 +395,11 @@ Development will gradually move from a simple framebuffer terminal toward a more
 * [x] Cursor
 * [x] Cursor blinking
 * [x] Terminal scrolling
+* [x] Interrupt Descriptor Table
+* [x] 8259 PIC initialization
+* [x] Hardware interrupt support
+* [x] Keyboard `IRQ1`
+* [x] Keyboard interrupt handler
 
 ### v0.2 — Better Shell
 
@@ -249,25 +410,32 @@ Development will gradually move from a simple framebuffer terminal toward a more
 * [ ] Lowercase input
 * [ ] Tab completion
 * [ ] Shell error handling
+* [ ] Command parser
+* [ ] Better keyboard scancode handling
+* [ ] Keyboard ring buffer
 
 ### v0.3 — Kernel Improvements
 
-* [ ] Interrupt Descriptor Table
-* [ ] Hardware interrupts
-* [ ] Proper keyboard interrupt
 * [ ] Timer interrupt
-* [ ] Better memory management
+* [ ] Programmable Interval Timer (PIT)
+* [ ] Keyboard modifier support
+* [ ] Memory management
 * [ ] Heap allocator
+* [ ] Global allocator
+* [ ] Better panic handling
+* [ ] CPU exception reporting
 
 ### Future
 
-* [ ] Process management
+* [ ] Physical memory manager
 * [ ] Virtual memory
-* [ ] Filesystem
+* [ ] Process management
 * [ ] User mode
 * [ ] System calls
+* [ ] Filesystem
 * [ ] Applications
 * [ ] More complete shell
+* [ ] Basic multitasking
 
 ---
 
@@ -277,12 +445,16 @@ This project is mainly built to learn:
 
 * Rust
 * `no_std` programming
-* Memory management
-* Hardware interaction
-* CPU architecture
-* Framebuffers
-* Keyboard controllers
-* Interrupts
+* Low-level memory management
+* x86_64 architecture
+* CPU exceptions
+* Hardware interrupts
+* Interrupt Descriptor Tables
+* PIC 8259
+* PS/2 keyboard controllers
+* Port I/O
+* Framebuffer graphics
+* Terminal implementation
 * Kernel architecture
 * Operating system fundamentals
 
@@ -294,13 +466,15 @@ AliOS is an educational and experimental project.
 
 It is not intended to replace a real operating system and should not be considered production-ready.
 
+The project is actively developed and its architecture may change significantly between versions.
+
 ---
 
 ## 👨‍💻 Author
 
 **Ali Fahmi Yusuf**
 
-Built as a personal learning project to explore **Rust and Operating System development**.
+Built as a personal learning project to explore **Rust, low-level programming, and Operating System development**.
 
 ---
 

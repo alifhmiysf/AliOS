@@ -45,45 +45,11 @@ const ACCENT_B: u8 = 230;
 // ============================================================
 
 #[inline(always)]
-unsafe fn inb(port: u16) -> u8 {
-    let value: u8;
-
-    unsafe {
-        core::arch::asm!(
-            "in al, dx",
-            in("dx") port,
-            out("al") value,
-            options(
-                nomem,
-                nostack,
-                preserves_flags
-            )
-        );
-    }
-
-    value
-}
 
 // ============================================================
 // KEYBOARD
 // ============================================================
 
-fn read_scancode() -> Option<u8> {
-    let status = unsafe {
-        inb(0x64)
-    };
-
-    // Tidak ada data keyboard.
-    if status & 1 == 0 {
-        return None;
-    }
-
-    Some(
-        unsafe {
-            inb(0x60)
-        }
-    )
-}
 
 // ============================================================
 // SCANCODE → CHAR
@@ -433,6 +399,8 @@ fn kernel_main(
                 info.bytes_per_pixel,
             );
             interrupts::init_idt();
+            interrupts::init_pics();
+            x86_64::instructions::interrupts::enable();
         // ====================================================
         // BACKGROUND
         // ====================================================
@@ -645,8 +613,8 @@ fn kernel_main(
             // =================================================
 
             if let Some(sc) =
-                read_scancode()
-            {
+    interrupts::take_scancode()
+{
                 // ---------------------------------------------
                 // Abaikan key release.
                 // ---------------------------------------------

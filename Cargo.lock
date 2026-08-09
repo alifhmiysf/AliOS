@@ -16,6 +16,7 @@ name = "alios-kernel"
 version = "0.1.0"
 dependencies = [
  "bootloader_api",
+ "pic8259",
  "x86_64",
 ]
 
@@ -292,6 +293,15 @@ name = "once_cell"
 version = "1.21.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
+
+[[package]]
+name = "pic8259"
+version = "0.10.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb844b5b01db1e0b17938685738f113bfc903846f18932b378bc0eabfa40e194"
+dependencies = [
+ "x86_64",
+]
 
 [[package]]
 name = "pin-project-lite"
